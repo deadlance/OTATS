@@ -42,6 +42,9 @@ Route::group(['middleware' => ['web', 'activity', 'checkblocked']], function () 
     Route::get('/re-activate/{token}', ['as' => 'user.reactivate', 'uses' => 'RestoreUserController@userReActivate']);
 });
 
+
+
+
 // Registered and Activated User Routes
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'checkblocked']], function () {
 
@@ -49,6 +52,10 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'checkblocked']]
     Route::get('/activation-required', ['uses' => 'Auth\ActivateController@activationRequired'])->name('activation-required');
     Route::get('/logout', ['uses' => 'Auth\LoginController@logout'])->name('logout');
 });
+
+
+
+
 
 // Registered and Activated User Routes
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
@@ -62,6 +69,9 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'chec
         'uses' => 'ProfilesController@show',
     ]);
 });
+
+
+
 
 // Registered, activated, and is current user routes.
 Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', 'twostep', 'checkblocked']], function () {
@@ -114,6 +124,17 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
 
 });
 
+
+
+
+// Registered, activated, and is manager route.
+Route::group(['middleware' => ['auth', 'activated', 'role:manager', 'activity', 'twostep', 'checkblocked']], function() {
+
+});
+
+
+
+
 // Registered, activated, and is admin routes.
 Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 'twostep', 'checkblocked']], function () {
     Route::resource('/users/deleted', 'SoftDeletesController', [
@@ -143,6 +164,16 @@ Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 't
     Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
     Route::get('routes', 'AdminDetailsController@listRoutes');
     Route::get('active-users', 'AdminDetailsController@activeUsers');
+
+
+
+    Route::resource('employeemanager',
+                  'EmployeemanagerController'
+    );
+
+
+
+    Route::redirect('/php', '/phpinfo', 301);
+
 });
 
-Route::redirect('/php', '/phpinfo', 301);

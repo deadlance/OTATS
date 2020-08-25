@@ -24,6 +24,10 @@
                                 {!! trans('titles.adminUserList') !!}
                             </a>
                             <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/employeemanager">
+                                Employee Manager
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item {{ Request::is('users/create') ? 'active' : null }}" href="{{ url('/users/create') }}">
                                 {!! trans('titles.adminNewUser') !!}
                             </a>

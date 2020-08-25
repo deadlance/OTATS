@@ -1,3 +1,10 @@
+## TODO / REDO:
+
+ - Timesheet statuses need to be dynamic, not hardcoded. They're in the database now, but they're still hardcoded.
+ - Status should allow for an editable / non-editable flag.
+
+<hr />>
+
 ## Laravel Auth
 
 #### Laravel Auth is a Complete Build of Laravel 7 with Email Registration Verification, Social Authentication, User Roles and Permissions, User Profiles, and Admin restricted user management system. Built on Bootstrap 4.

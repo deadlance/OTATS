@@ -16,93 +16,55 @@
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#new">Current</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#pending">Pending</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#approved">Approved</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#denied">Denied</a>
-            </li>
+            @foreach($statuses as $status)
+                <li class="nav-item">
+                    @if($loop->first)
+                        <a class="nav-link active" data-toggle="tab" href="#{{ $status->slug }}">{{ $status->name }}</a>
+                    @else
+                        <a class="nav-link" data-toggle="tab" href="#{{ $status->slug }}">{{ $status->name }}</a>
+                    @endif
+                </li>
+            @endforeach
         </ul>
 
-        <!-- Tab panes -->
         <div class="tab-content">
-            <div class="tab-pane container active" id="new">
-                @foreach($timesheets as $timesheet)
-                    @if($timesheet->status->last()->name == 'new')
-                        <div class="row mt-2">
-                            <div class="col-3">
-                                <div class="btn-group">
-                                    <a href="/timesheet/{{ $timesheet->id }}/edit" class="btn btn-info" role="button">Edit</a>
-                                    <button type="button" class="btn btn-success">Submit</button>
-                                </div>
-                            </div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></div>
-                            <div class="col-3"><h5>Hours Worked</h5></div>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
+            @foreach($statuses as $status)
+                @if($loop->first)
+                    <div class="tab-pane container active" id="{{ $status->slug }}">
+                @else
+                    <div class="tab-pane container" id="{{ $status->slug }}">
+                @endif
 
-            <div class="tab-pane container fade" id="pending">
                 @foreach($timesheets as $timesheet)
-                    @if($timesheet->status->last()->name == 'pending')
-                        <div class="row mt-2">
-                            <div class="col-3">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-secondary">View</button>
-                                </div>
-                            </div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></div>
-                            <div class="col-3"><h5>Hours Worked</h5></div>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
 
-            <div class="tab-pane container fade" id="approved">
-                @foreach($timesheets as $timesheet)
-                    @if($timesheet->status->last()->name == 'approved')
+                    @if($timesheet->status->last()->slug == $status->slug)
                         <div class="row mt-2">
-                            <div class="col-3">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-secondary">View</button>
-                                </div>
-                            </div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></div>
-                            <div class="col-3"><h5>Hours Worked</h5></div>
-                        </div>
-                    @endif
-                @endforeach
-            </div>
 
-            <div class="tab-pane container fade" id="denied">
-                @foreach($timesheets as $timesheet)
-                    @if($timesheet->status->last()->name == 'denied')
-                        <div class="row mt-2">
+                            @if($status->editable || $status->submittable)
                             <div class="col-3">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-secondary">View</button>
+                                    @if($status->editable)
+                                        <a href="/timesheet/{{ $timesheet->id }}/edit" class="btn btn-info" role="button">Edit</a>
+                                    @endif
+                                    @if($status->submittable)
+                                        <form action="/timesheet/submit/{{ $timesheet->id }}" method="get">
+                                            @csrf
+                                            <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
+                                            <button type="submit" class="btn btn-success">Submit</button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
+                            @endif
                             <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></div>
                             <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></div>
-                            <div class="col-3"><h5>Hours Worked</h5></div>
+                            <div class="col-3"><h5>{{ intdiv($timesheet->timeworked, 60) }} hours {{ (int)$timesheet->timeworked % 60 }} minutes</h5></div>
                         </div>
                     @endif
                 @endforeach
-            </div>
+                </div>
+            @endforeach
         </div>
-    </div>
-
 
 @endsection
 

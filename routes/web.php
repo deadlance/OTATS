@@ -111,10 +111,14 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
     Route::post('avatar/upload', ['as' => 'avatar.upload', 'uses' => 'ProfilesController@upload']);
 
     // Timesheet Routes
+    Route::get('/timesheet/submit/{id}', 'TimesheetController@submit_timesheet');
+
     Route::resource(
         'timesheet',
         'TimesheetController'
     );
+
+    Route::get('timesheet/total_timeworked', 'TimesheetController@total_timeworked');
 
     // Timesheet Routes
     Route::resource(
@@ -126,11 +130,16 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
 
 
 
-
 // Registered, activated, and is manager route.
 Route::group(['middleware' => ['auth', 'activated', 'role:manager', 'activity', 'twostep', 'checkblocked']], function() {
 
+    Route::get('/manager/timesheet/pending', 'TimesheetController@pending_timesheet_manager');
+
+    Route::get('/manager/timesheet', 'TimesheetController@timesheet_manager');
+
 });
+
+
 
 
 
@@ -176,4 +185,5 @@ Route::group(['middleware' => ['auth', 'activated', 'role:admin', 'activity', 't
     Route::redirect('/php', '/phpinfo', 301);
 
 });
+
 

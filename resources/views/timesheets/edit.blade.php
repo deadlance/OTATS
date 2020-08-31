@@ -16,8 +16,8 @@
         <pre>
             {{ json_encode($timesheet_data, JSON_PRETTY_PRINT) }}
         </pre>
-
 -->
+
 
 
     <div class="container">
@@ -27,13 +27,16 @@
                 <h3>Edit Timesheet</h3>
             </div>
             <div class="col-6">
+                <form action="/timesheet/submit/{{ $timesheet_data['id'] }}" method="get">
+                    @csrf
+                    <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}">
 
                 @if($timesheet_data['submittable'])
-                    <button class="btn btn-block btn-primary" id="submit_timesheet">Submit Timesheet</button>
+                    <button type="submit" class="btn btn-block btn-primary" id="submit_timesheet">Submit Timesheet</button>
                 @else
                     <button class="btn btn-block btn-primary" id="submit_timesheet" disabled>Submit Timesheet</button>
                 @endif
-
+                </form>
             </div>
         </div>
 

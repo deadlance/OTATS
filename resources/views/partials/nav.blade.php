@@ -84,6 +84,23 @@
                     </li>
                 @endrole
 
+                @role('manager')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Timesheets
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item  {{ Request::is('blocker') ? 'active' : null }}" href="{{ url('/manager/timesheet/pending') }}">
+                                Pending Timesheets
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item  {{ Request::is('blocker') ? 'active' : null }}" href="{{ url('/manager/timesheet') }}">
+                                View All Timesheets
+                            </a>
+                        </div>
+                    </li>
+                @endrole
+
             </ul>
             {{-- Right Side Of Navbar --}}
             <ul class="navbar-nav ml-auto">

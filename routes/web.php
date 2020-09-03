@@ -133,6 +133,11 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
 // Registered, activated, and is manager route.
 Route::group(['middleware' => ['auth', 'activated', 'role:manager', 'activity', 'twostep', 'checkblocked']], function() {
 
+    Route::get('/timesheet/deny/{id}', 'TimesheetController@deny_timesheet');
+    Route::get('/timesheet/return/{id}', 'TimesheetController@return_timesheet');
+    Route::get('/timesheet/approve/{id}', 'TimesheetController@approve_timesheet');
+
+
     Route::get('/manager/timesheet/pending', 'TimesheetController@pending_timesheet_manager');
 
     Route::get('/manager/timesheet', 'TimesheetController@timesheet_manager');

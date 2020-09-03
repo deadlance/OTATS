@@ -189,7 +189,26 @@ class TimesheetController extends Controller
         return redirect('/timesheet');
     }
 
+    public function deny_timesheet($id) {
+        $timesheet = Timesheet::where('id', $id)->with('status')->first();
+        $pending_status = Status::where('slug', 'denied')->first();
+        $timesheet->status()->attach($pending_status->id);
+        return redirect('/manager/timesheet/pending');
+    }
 
+    public function return_timesheet($id) {
+        $timesheet = Timesheet::where('id', $id)->with('status')->first();
+        $pending_status = Status::where('slug', 'returned')->first();
+        $timesheet->status()->attach($pending_status->id);
+        return redirect('/manager/timesheet/pending');
+    }
+
+    public function approve_timesheet($id) {
+        $timesheet = Timesheet::where('id', $id)->with('status')->first();
+        $pending_status = Status::where('slug', 'approved')->first();
+        $timesheet->status()->attach($pending_status->id);
+        return redirect('/manager/timesheet/pending');
+    }
 
 
     public function pending_timesheet_manager()
@@ -213,14 +232,10 @@ class TimesheetController extends Controller
                 foreach($emp_ts_data[$emp->id]['timesheets'] as $ts) {
                     $time_worked = $this->total_timeworked($ts->id);
                     $ts->timeworked = $time_worked;
-
                 }
-
             }
         }
-
         return view('manager.timesheets.pending',compact('emp_ts_data'));
-
     }
 
 

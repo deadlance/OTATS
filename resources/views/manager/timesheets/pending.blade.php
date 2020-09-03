@@ -13,7 +13,11 @@
 
 
         <h3>Pending Timesheets</h3>
-
+<!--
+        <pre>
+            {{ json_encode($emp_ts_data, JSON_PRETTY_PRINT) }}
+        </pre>
+-->
 
         @foreach($emp_ts_data as $emp)
 
@@ -33,11 +37,28 @@
                         <div class="col-2">
                             {{ intdiv($timesheet->timeworked,60) }} hours {{ $timesheet->timeworked % 60 }} minutes
                         </div>
-                        <div class="col-2 text-right">
+                        <div class="col-3 text-right">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary">View</button>
-                                <button type="button" class="btn btn-danger">Deny</button>
-                                <button type="button" class="btn btn-success">Approve</button>
+
+                                <form action="/timesheet/return/{{ $timesheet->id }}" method="get">
+                                    @csrf
+                                    <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
+                                    <button type="submit" class="btn btn-warning">Return</button>
+                                </form>
+
+                                <form action="/timesheet/approve/{{ $timesheet->id }}" method="get">
+                                    @csrf
+                                    <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
+                                    <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
+
+                                <form action="/timesheet/deny/{{ $timesheet->id }}" method="get">
+                                    @csrf
+                                    <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
+                                    <button type="submit" onClick="return confirm('Are you sure you wish to deny this timesheet?')" class="btn btn-danger">Deny</button>
+                                </form>
+
                             </div>
                         </div>
                     </div>

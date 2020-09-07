@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,5 +21,10 @@ class Timesheet extends Model
     public function entry()
     {
         return $this->belongsToMany('App\Models\Entry');
+    }
+
+    public function comments()
+    {
+        return $this->belongsToMany('App\Models\Comment');
     }
 }

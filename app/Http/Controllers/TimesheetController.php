@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
-use App\Timesheet;
+use App\Models\Timesheet;
 use App\Models\Status;
-use App\Entry;
+use App\Models\Comment;
+use App\Models\Entry;
 use DateTime;
 use DatePeriod;
 use DateInterval;
@@ -78,7 +79,7 @@ class TimesheetController extends Controller
      */
     public function edit($id)
     {
-        $timesheet = Timesheet::where('id', $id)->first();
+        $timesheet = Timesheet::where('id', $id)->with('comments')->first();
 
         $day_after = new DateTime($timesheet->end .  ' +1 day');
 
@@ -101,6 +102,12 @@ class TimesheetController extends Controller
             "total_minutes" => 0,
             "dailies" => [],
         ];
+
+        foreach($timesheet->comments as $comment) {
+            $commentor = User::where('id', $comment->user_id)->first();
+            $timesheet_data['comments'][$comment->id] = $comment;
+            $timesheet_data['comments'][$comment->id]['user'] = $commentor;
+        }
 
         $status = $timesheet->status;
         $decoded_status = json_decode($status, true);
@@ -181,11 +188,27 @@ class TimesheetController extends Controller
         //
     }
 
+    public function add_comment($id, Request $request) {
+        $timesheet = Timesheet::where('id', $id)->first();
+        $comment = Comment::create($request->all());
+        $timesheet->comments()->attach($comment->id);
+
+        return redirect($request->redirect_to);
+    }
+
 
     public function submit_timesheet($id) {
         $timesheet = Timesheet::where('id', $id)->with('status')->first();
         $pending_status = Status::where('slug', 'pending')->first();
         $timesheet->status()->attach($pending_status->id);
+
+        $comment = new Comment;
+        $comment->user_id = Auth::user()->id;
+        $comment->timesheet_id = $timesheet->id;
+        $comment->comment = 'Timesheet Submitted';
+        $comment->save();
+        $timesheet->comments()->attach($comment->id);
+
         return redirect('/timesheet');
     }
 
@@ -193,6 +216,14 @@ class TimesheetController extends Controller
         $timesheet = Timesheet::where('id', $id)->with('status')->first();
         $pending_status = Status::where('slug', 'denied')->first();
         $timesheet->status()->attach($pending_status->id);
+
+        $comment = new Comment;
+        $comment->user_id = Auth::user()->id;
+        $comment->timesheet_id = $timesheet->id;
+        $comment->comment = 'Timesheet Denied';
+        $comment->save();
+        $timesheet->comments()->attach($comment->id);
+
         return redirect('/manager/timesheet/pending');
     }
 
@@ -200,6 +231,14 @@ class TimesheetController extends Controller
         $timesheet = Timesheet::where('id', $id)->with('status')->first();
         $pending_status = Status::where('slug', 'returned')->first();
         $timesheet->status()->attach($pending_status->id);
+
+        $comment = new Comment;
+        $comment->user_id = Auth::user()->id;
+        $comment->timesheet_id = $timesheet->id;
+        $comment->comment = 'Timesheet Returned';
+        $comment->save();
+        $timesheet->comments()->attach($comment->id);
+
         return redirect('/manager/timesheet/pending');
     }
 
@@ -207,6 +246,14 @@ class TimesheetController extends Controller
         $timesheet = Timesheet::where('id', $id)->with('status')->first();
         $pending_status = Status::where('slug', 'approved')->first();
         $timesheet->status()->attach($pending_status->id);
+
+        $comment = new Comment;
+        $comment->user_id = Auth::user()->id;
+        $comment->timesheet_id = $timesheet->id;
+        $comment->comment = 'Timesheet Approved';
+        $comment->save();
+        $timesheet->comments()->attach($comment->id);
+
         return redirect('/manager/timesheet/pending');
     }
 
@@ -218,7 +265,7 @@ class TimesheetController extends Controller
         $emp_ts_data = [];
 
         foreach($employees as $emp) {
-            $timesheets = Timesheet::where('user_id', $emp->employee_user_id)->with('status')->get();
+            $timesheets = Timesheet::where('user_id', $emp->employee_user_id)->with('status')->with('comments')->get();
 
             if($timesheets->count() > 0) {
                 $timesheets = $timesheets->filter(function ($ts) {
@@ -235,9 +282,17 @@ class TimesheetController extends Controller
                 }
             }
         }
+
         return view('manager.timesheets.pending',compact('emp_ts_data'));
     }
 
+    public function manager_view_timesheet($id) {
+        $timesheet = Timesheet::where('id', $id)->with('status')->with('comments')->first();
+        $employee_data = User::where('id', $timesheet->user_id)->first();
+        $timeworked = $this->total_timeworked($id);
+
+        return view('manager.timesheets.view', compact(['employee_data', 'timesheet', 'timeworked']));
+    }
 
     public function timesheet_manager()
     {

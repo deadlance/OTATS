@@ -120,6 +120,8 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
 
     Route::get('timesheet/total_timeworked', 'TimesheetController@total_timeworked');
 
+    Route::post('timesheet/add_comment/{id}', 'TimesheetController@add_comment');
+
     // Timesheet Routes
     Route::resource(
         'entry',
@@ -139,8 +141,9 @@ Route::group(['middleware' => ['auth', 'activated', 'role:manager', 'activity', 
 
 
     Route::get('/manager/timesheet/pending', 'TimesheetController@pending_timesheet_manager');
-
+    Route::get('/manager/timesheet/view/{id}', 'TimesheetController@manager_view_timesheet');
     Route::get('/manager/timesheet', 'TimesheetController@timesheet_manager');
+
 
 });
 

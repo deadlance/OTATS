@@ -12,7 +12,7 @@
         $submit = false;
     @endphp
 
-<!--
+    <!--
         <pre>
             {{ json_encode($timesheet_data, JSON_PRETTY_PRINT) }}
         </pre>
@@ -31,12 +31,18 @@
                     @csrf
                     <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}">
 
-                @if($timesheet_data['submittable'])
-                    <button type="submit" class="btn btn-block btn-primary" id="submit_timesheet">Submit Timesheet</button>
-                @else
-                    <button class="btn btn-block btn-primary" id="submit_timesheet" disabled>Submit Timesheet</button>
-                @endif
+                    @if($timesheet_data['submittable'])
+                        <button type="submit" class="btn btn-primary" id="submit_timesheet">Submit Timesheet</button>
+                    @else
+                        <button class="btn btn-primary" id="submit_timesheet" disabled>Submit Timesheet</button>
+                    @endif
+                    <button type="button" class="btn btn-warning" id="comments_button" data-toggle="modal" data-target="#commentsModal">Comments
+                        @if(isset($timesheet_data['comments']))
+                            <span class="badge badge-dark">{{ count($timesheet_data['comments']) }}</span>
+                        @endif
+                    </button>
                 </form>
+
             </div>
         </div>
 
@@ -51,7 +57,8 @@
             </div>
             <div class="row">
                 <div class="col-12 text-center">
-                    Total Time: {{ intdiv($timesheet_data['total_minutes'], 60) }} hours and {{ (int)$timesheet_data['total_minutes'] % 60 }} minutes
+                    Total Time: {{ intdiv($timesheet_data['total_minutes'], 60) }} hours
+                    and {{ (int)$timesheet_data['total_minutes'] % 60 }} minutes
                 </div>
             </div>
         </div>
@@ -62,8 +69,10 @@
                 <div class="row">
                     <div class="col-lg-4 col-md-12 text-center">
                         <h4>{{ date("D, M j, Y", strtotime($day['date'])) }}</h4>
-                        <button class="btn btn-block btn-primary" data-toggle="modal" data-target="#modal_{{ $day['date'] }}" data-backdrop="static">Add Entry</button>
-                        <br />
+                        <button class="btn btn-block btn-primary" data-toggle="modal"
+                                data-target="#modal_{{ $day['date'] }}" data-backdrop="static">Add Entry
+                        </button>
+                        <br/>
                         {{ intdiv($day['minutes'], 60) }} hours and {{ (int)$day['minutes'] % 60 }} minutes
                     </div>
                     <div class="col-lg-8 col-md-12">
@@ -88,7 +97,9 @@
                                         @csrf
                                         @method('DELETE')
 
-                                        <button type="submit" class="btn btn-link" style="color:tomato" onClick="return confirm('Are you sure you wish to delete this entry?')"><span class="fa fa-times"></span></button>
+                                        <button type="submit" class="btn btn-link" style="color:tomato"
+                                                onClick="return confirm('Are you sure you wish to delete this entry?')">
+                                            <span class="fa fa-times"></span></button>
                                     </form>
                                 </div>
                             </div>
@@ -102,7 +113,8 @@
 
                             <div class="row">
                                 <div class="col-12 bg-warning pt-2 pb-2">
-                                    You will not be able to submit this timesheet due to having an incorrect number of activities. You must clock-out for every clock-in.
+                                    You will not be able to submit this timesheet due to having an incorrect number of
+                                    activities. You must clock-out for every clock-in.
                                 </div>
                             </div>
 
@@ -130,22 +142,23 @@
 
                             <!-- Modal Header -->
                             <div class="modal-header">
-                                <h4 class="modal-title"><h2>Add Entry for: {{ date("D, M j, Y", strtotime($day['date'])) }}</h2></h4>
+                                <h4 class="modal-title"><h2>Add Entry
+                                        for: {{ date("D, M j, Y", strtotime($day['date'])) }}</h2></h4>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
 
                             <!-- Modal body -->
                             <div class="modal-body">
                                 @csrf
-                                <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}" />
-                                <input type="hidden" name="entry_date" value="{{ $day['date'] }}" />
+                                <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}"/>
+                                <input type="hidden" name="entry_date" value="{{ $day['date'] }}"/>
 
                                 <div class="row">
                                     <div class="col-6">
                                         <h4>Enter Time</h4>
                                     </div>
                                     <div class="col-6">
-                                        <input id="clock_in{{ $day['date'] }}" name="activity" width="276" />
+                                        <input id="clock_in{{ $day['date'] }}" name="activity" width="276"/>
                                     </div>
                                 </div>
 
@@ -156,7 +169,8 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="comment">Comments:</label>
-                                            <textarea class="form-control" rows="5" id="comments" name="comments" maxlength="4294967295"></textarea>
+                                            <textarea class="form-control" rows="5" id="comments" name="comments"
+                                                      maxlength="4294967295"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -166,7 +180,10 @@
 
                             <!-- Modal footer -->
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="resetTimes('clock_in{{ $day['date'] }}','clock_out{{ $day['date'] }}')">Cancel</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                        onClick="resetTimes('clock_in{{ $day['date'] }}','clock_out{{ $day['date'] }}')">
+                                    Cancel
+                                </button>
                                 <button type="submit" class="btn btn-primary">Add Entry</button>
                             </div>
                         </form>
@@ -175,8 +192,76 @@
                 </div>
             </div>
 
-        @endforeach
+    @endforeach
 
+    <!-- Comments Modal -->
+        <div class="modal" id="commentsModal">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Comments</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="container">
+                            @if(isset($timesheet_data['comments']))
+                                @foreach($timesheet_data['comments'] as $comment)
+                                    <div class="row border mt-2">
+                                        <div class="col-8 bg-light">
+                                            {{ $comment->user->first_name }} {{ $comment->user->last_name }}
+                                        </div>
+                                        <div class="col-4 bg-light">
+                                            {{ $comment->created_at }}
+                                        </div>
+                                        <div class="col-12">
+                                            {{ $comment->comment }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+
+                        <div class="container mt-4">
+                            <form action="/timesheet/add_comment/{{ $timesheet_data['id'] }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}"/>
+                                <input type="hidden" name="user_id" value="{{ Auth::user()->id }}"/>
+                                <input type="hidden" name="redirect_to"
+                                       value="/timesheet/{{ $timesheet_data['id'] }}/edit"/>
+                                <div class="row">
+                                    <div class="col-8">
+                                        <h4>Add Comment</h4>
+                                    </div>
+                                    <div class="col-4">
+                                        <button type="submit" class="btn btn-block btn-success">Add Comment</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <textarea class="form-control" rows="5" id="comment"
+                                                      name="comment"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
     </div>
 @endsection
@@ -216,7 +301,7 @@
         }
 
         function diff_minutes(dt2, dt1) {
-            var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+            var diff = (dt2.getTime() - dt1.getTime()) / 1000;
             diff /= 60;
             return Math.abs(Math.round(diff));
         }

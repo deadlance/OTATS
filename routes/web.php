@@ -122,6 +122,9 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
 
     Route::post('timesheet/add_comment/{id}', 'TimesheetController@add_comment');
 
+    Route::get('timesheet/delete_hours/{timesheet_id}/{hours_id}', 'TimesheetController@delete_hours');
+    Route::post('timesheet/add_hours/{timesheet_id}', 'TimesheetController@add_hours');
+
     // Timesheet Routes
     Route::resource(
         'entry',

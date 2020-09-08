@@ -8,6 +8,8 @@ use App\Models\Timesheet;
 use App\Models\Status;
 use App\Models\Comment;
 use App\Models\Entry;
+use App\Models\Hourtype;
+use App\Models\HourtypeTimesheet;
 use DateTime;
 use DatePeriod;
 use DateInterval;
@@ -79,7 +81,7 @@ class TimesheetController extends Controller
      */
     public function edit($id)
     {
-        $timesheet = Timesheet::where('id', $id)->with('comments')->first();
+        $timesheet = Timesheet::where('id', $id)->with('comments')->with('hours')->first();
 
         $day_after = new DateTime($timesheet->end .  ' +1 day');
 
@@ -160,9 +162,26 @@ class TimesheetController extends Controller
             $timesheet_data['dailies'][$dt->format('Y-m-j')]['minutes'] = $day_minutes;
             $timesheet_data['total_minutes'] = $timesheet_data['total_minutes'] + $day_minutes;
 
+
+
         }
 
-        return view('timesheets.edit',compact('timesheet_data'));
+        $hourtypes = Hourtype::pluck('name', 'id');
+        $hours = HourtypeTimesheet::where('timesheet_id', $timesheet->id)->get();
+        $total_pto = 0;
+
+        foreach($hours as $hr) {
+            $tp = Hourtype::where('id', $hr->hourtype_id)->first();
+            $hr->hourtype_name = $tp->name;
+            $hr->hourtype_slug = $tp->slug;
+            $hr->hourtype_description = $tp->description;
+
+            $total_pto = $total_pto + $hr->hours;
+        }
+
+        $timesheet_data['total_pto'] = $total_pto;
+
+        return view('timesheets.edit',compact(['timesheet_data', 'hourtypes', 'hours']));
     }
 
     /**
@@ -193,6 +212,21 @@ class TimesheetController extends Controller
         $comment = Comment::create($request->all());
         $timesheet->comments()->attach($comment->id);
 
+        return redirect($request->redirect_to);
+    }
+
+    public function add_hours($id, Request $request) {
+        $timesheet = Timesheet::where('id', $id)->first();
+        $hourtype = Hourtype::where('id', $request->hourtype)->first();
+        $timesheet->hours()->attach($hourtype, ['hours' => $request->hours, 'notes' => $request->notes, 'updated_at' => now(), 'created_at' => now()]);
+        return redirect($request->redirect_to);
+    }
+
+    public function delete_hours($timesheet_id, $hours_id, Request $request) {
+        $timesheet = Timesheet::where('id', $timesheet_id)->first();
+        $hr = HourtypeTimesheet::find($hours_id);
+        $timesheet->hours()->detach($hours_id);
+        $hr->delete();
         return redirect($request->redirect_to);
     }
 

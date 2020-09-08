@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Hourtype extends Model
 {
     //
+    protected $table = 'hourtype';
 }

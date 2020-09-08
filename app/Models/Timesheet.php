@@ -27,4 +27,14 @@ class Timesheet extends Model
     {
         return $this->belongsToMany('App\Models\Comment');
     }
+
+    public function hours()
+    {
+        return $this->belongsToMany('App\Models\Hourtype');
+    }
+
+    public function timesheet_hours()
+    {
+        return $this->belongsToMany('App\Models\HourtypeTimesheet');
+    }
 }

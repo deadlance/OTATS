@@ -18,7 +18,20 @@
         </pre>
 -->
 
+    @if(!$timesheet_data['current_status']['editable'])
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>This timesheet cannot be edited.</h1>
 
+                    <script>
+                        // your "Imaginary javascript"
+                        window.location.href = '{{ url('/timesheet/' . $timesheet_data['id']) }}';
+                    </script>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="container">
 
@@ -26,7 +39,7 @@
             <div class="col-6">
                 <h3>Edit Timesheet</h3>
             </div>
-            <div class="col-6">
+            <div class="col-6 text-right">
                 <form action="/timesheet/submit/{{ $timesheet_data['id'] }}" method="get">
                     @csrf
                     <input type="hidden" name="timesheet_id" value="{{ $timesheet_data['id'] }}">
@@ -58,8 +71,11 @@
             </div>
             <div class="row">
                 <div class="col-12 text-center">
-                    Total Time: {{ intdiv($timesheet_data['total_minutes'], 60) }} hours
+                    Time Worked: {{ intdiv($timesheet_data['total_minutes'], 60) }} hours
                     and {{ (int)$timesheet_data['total_minutes'] % 60 }} minutes
+                </div>
+                <div class="col-12 text-center">
+                    PTO: {{ intdiv($timesheet_data['total_pto_time'], 60) }} hour(s) and {{ $timesheet_data['total_pto_time'] % 60 }} minutes
                 </div>
             </div>
         </div>

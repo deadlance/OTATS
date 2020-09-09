@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
-use App\Timesheet;
-use App\Entry;
+use App\Models\Timesheet;
+use App\Models\Entry;
 use DateTime;
 
 

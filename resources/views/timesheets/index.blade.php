@@ -34,34 +34,50 @@
                 @else
                     <div class="tab-pane container" id="{{ $status->slug }}">
                 @endif
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Hours Worked</th>
+                            <th>PTO Used</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($timesheets as $timesheet)
 
-                @foreach($timesheets as $timesheet)
+                            @if($timesheet->status->last()->slug == $status->slug)
+                                <tr>
 
-                    @if($timesheet->status->last()->slug == $status->slug)
-                        <div class="row mt-2">
-
-                            @if($status->editable || $status->submittable)
-                            <div class="col-3">
-                                <div class="btn-group">
-                                    @if($status->editable)
-                                        <a href="/timesheet/{{ $timesheet->id }}/edit" class="btn btn-info" role="button">Edit</a>
-                                    @endif
-                                    @if($status->submittable)
-                                        <form action="/timesheet/submit/{{ $timesheet->id }}" method="get">
-                                            @csrf
-                                            <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
-                                            <button type="submit" class="btn btn-success">Submit</button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </div>
+                                    <td>&nbsp;
+                                        <div class="btn-group">
+                                            @if($status->editable || $status->submittable)
+                                                @if($status->editable)
+                                                    <a href="/timesheet/{{ $timesheet->id }}/edit" class="btn btn-info" role="button">Edit</a>
+                                                @endif
+                                                @if($status->submittable)
+                                                    <form action="/timesheet/submit/{{ $timesheet->id }}" method="get">
+                                                        @csrf
+                                                        <input type="hidden" name="timesheet_id" value="{{ $timesheet->id }}">
+                                                        <button type="submit" class="btn btn-success">Submit</button>
+                                                    </form>
+                                                @endif
+                                            @else
+                                                <a href="/timesheet/{{ $timesheet->id }}" class="btn btn-success" role="button">View</a>
+                                            <button type="button" class="btn btn-warning">Download</button>
+                                        @endif
+                                        </div>
+                                    </td>
+                                    <td><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></td>
+                                    <td><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></td>
+                                    <td><h5>{{ intdiv($timesheet->timeworked, 60) }} hours {{ (int)$timesheet->timeworked % 60 }} minutes</h5></td>
+                                    <td><h5>{{ intdiv($timesheet->pto, 60) }} hours {{ (int)$timesheet->pto % 60 }} minutes</h5></td>
+                                </tr>
                             @endif
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->start)) }}</h5></div>
-                            <div class="col-3"><h5>{{ date("F j, Y", strtotime($timesheet->end)) }}</h5></div>
-                            <div class="col-3"><h5>{{ intdiv($timesheet->timeworked, 60) }} hours {{ (int)$timesheet->timeworked % 60 }} minutes</h5></div>
-                        </div>
-                    @endif
-                @endforeach
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
             @endforeach
         </div>

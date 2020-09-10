@@ -424,7 +424,7 @@ class TimesheetController extends Controller
         $emp_ts_data = [];
 
         foreach ($employees as $emp) {
-            $timesheets = Timesheet::where('user_id', $emp->employee_user_id)->with('status')->with('comments')->get();
+            $timesheets = Timesheet::where('user_id', $emp->employee_user_id)->with('status')->get();
 
             if ($timesheets->count() > 0) {
                 $timesheets = $timesheets->filter(function ($ts) {
@@ -438,6 +438,7 @@ class TimesheetController extends Controller
                 foreach ($emp_ts_data[$emp->id]['timesheets'] as $ts) {
                     $time_worked = $this->total_timeworked($ts->id);
                     $ts->timeworked = $time_worked;
+                    $ts->pto = $this->get_timesheet_pto($ts->id);
                 }
             }
         }
@@ -445,18 +446,20 @@ class TimesheetController extends Controller
         return view('manager.timesheets.pending', compact('emp_ts_data'));
     }
 
-    public function manager_view_timesheet($id)
-    {
-        $timesheet = Timesheet::where('id', $id)->with('status')->with('comments')->first();
-        $employee_data = User::where('id', $timesheet->user_id)->first();
-        $timeworked = $this->total_timeworked($id);
-
-        return view('manager.timesheets.view', compact(['employee_data', 'timesheet', 'timeworked']));
-    }
-
     public function timesheet_manager()
     {
+        $employees = Employeemanager::where('manager_user_id', Auth::user()->id)->get();
+        foreach($employees as $emp) {
+            $emp->emp_data = User::where('id', $emp->employee_user_id)->first();
+            $emp->timesheets = Timesheet::where('user_id', $emp->employee_user_id)->with('status')->get();
+            foreach($emp->timesheets as $timesheet) {
+                $timesheet->pto = $this->get_timesheet_pto($timesheet->id);
+                $timesheet->time_worked = $this->total_timeworked($timesheet->id);
+                $timesheet->current_status = $timesheet->status->last();
+            }
 
+        }
+        return view('manager.timesheets.view_all', compact('employees'));
     }
 
 

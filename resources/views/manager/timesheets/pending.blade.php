@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ Auth::user()->name }}'s' Timesheets
+    Pending Timesheets
 @endsection
 
 @section('template_fastload_css')
@@ -26,20 +26,40 @@
                     {{ $emp['employee_data']['first_name'] }} {{ $emp['employee_data']['last_name'] }}
                 </div>
             </div>
+            <div class="row pb-2 pt-2 border-bottom">
+                <div class="col-3">
+                    Time Frame
+                </div>
+                <div class="col-2">
+                    Submitted
+                </div>
+                <div class="col-2">
+                    Hours Worked
+                </div>
+                <div class="col-2">
+                    PTO
+                </div>
+                <div class="col-3 text-right">
+                    &nbsp;
+                </div>
+            </div>
                 @foreach($emp['timesheets'] as $timesheet)
                     <div class="row pb-2 pt-2">
-                        <div class="col-4">
-                            {{ date('d M Y', strtotime($timesheet->start)) }} through {{ date('d M Y', strtotime($timesheet->end)) }}
-                        </div>
                         <div class="col-3">
-                            Submitted {{ $timesheet->status[0]->created_at }}
+                            {{ date('d M Y', strtotime($timesheet->start)) }} - {{ date('d M Y', strtotime($timesheet->end)) }}
+                        </div>
+                        <div class="col-2">
+                            {{ $timesheet->status[0]->created_at }} <!-- submitted -->
                         </div>
                         <div class="col-2">
                             {{ intdiv($timesheet->timeworked,60) }} hours {{ $timesheet->timeworked % 60 }} minutes
                         </div>
+                        <div class="col-2">
+                            {{ intdiv($timesheet->pto,60) }} hours {{ $timesheet->pto % 60 }} minutes
+                        </div>
                         <div class="col-3 text-right">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary">View</button>
+                                <a href="/timesheet/{{ $timesheet->id }}" class="btn btn-primary" role="button">View</a>
 
                                 <form action="/timesheet/return/{{ $timesheet->id }}" method="get">
                                     @csrf

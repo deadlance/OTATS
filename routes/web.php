@@ -144,7 +144,6 @@ Route::group(['middleware' => ['auth', 'activated', 'role:manager', 'activity', 
 
 
     Route::get('/manager/timesheet/pending', 'TimesheetController@pending_timesheet_manager');
-    Route::get('/manager/timesheet/view/{id}', 'TimesheetController@manager_view_timesheet');
     Route::get('/manager/timesheet', 'TimesheetController@timesheet_manager');
 
 

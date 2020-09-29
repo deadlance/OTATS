@@ -125,11 +125,15 @@ Route::group(['middleware' => ['auth', 'activated', 'currentUser', 'activity', '
     Route::get('timesheet/delete_hours/{timesheet_id}/{hours_id}', 'TimesheetController@delete_hours');
     Route::post('timesheet/add_hours/{timesheet_id}', 'TimesheetController@add_hours');
 
+    Route::get('timesheet/download/{timesheet_id}', 'TimesheetController@downloadTimesheet');
+
     // Timesheet Routes
     Route::resource(
         'entry',
         'EntryController'
     );
+
+
 
 });
 

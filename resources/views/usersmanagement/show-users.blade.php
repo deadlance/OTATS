@@ -112,7 +112,7 @@
                                             <td>
                                                 {!! Form::open(array('url' => 'users/' . $user->id, 'class' => '', 'data-toggle' => 'tooltip', 'title' => 'Delete')) !!}
                                                     {!! Form::hidden('_method', 'DELETE') !!}
-                                                    {!! Form::button(trans('usersmanagement.buttons.delete'), array('class' => 'btn btn-danger btn-sm','type' => 'button', 'style' =>'width: 100%;' ,'data-toggle' => 'modal', 'data-target' => '#confirmDelete', 'data-title' => 'Delete User', 'data-message' => 'Are you sure you want to delete this user ?')) !!}
+                                                    {!! Form::button(trans('usersmanagement.buttons.delete'), array('class' => 'btn btn-danger btn-sm','type' => 'submit', 'style' =>'width: 100%;' ,'onClick' => 'confirm("Are you sure?")')) !!}
                                                 {!! Form::close() !!}
                                             </td>
                                             <td>
